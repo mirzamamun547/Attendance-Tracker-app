@@ -29,11 +29,10 @@ public class HelloController {
 
         @FXML
         private void handleStudent(ActionEvent event) throws IOException {
-            // Load Login.fxml for Student
+
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("login.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
 
-            // Pass user type to LoginController
             login loginController = fxmlLoader.getController();
             loginController.setUserType("Student");
 
@@ -57,7 +56,7 @@ public class HelloController {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("login.fxml"));
                 Scene scene = new Scene(fxmlLoader.load());
 
-                // Pass user type to LoginController
+
                 login loginController = fxmlLoader.getController();
                 loginController.setUserType("Teacher");
 
@@ -71,7 +70,7 @@ public class HelloController {
         @FXML
         private void handleSignup(ActionEvent event) throws IOException {
             if (isTeacher) {
-                // Load Signup.fxml (if you have separate Signup)
+
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("signup.fxml"));
                 Scene scene = new Scene(fxmlLoader.load());
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
