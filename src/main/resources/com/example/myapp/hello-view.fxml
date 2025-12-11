@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.myapp.HelloController"
+            prefHeight="400.0" prefWidth="600.0"
+            style="-fx-background-color: linear-gradient(to bottom, #f0f4f8, #d9e2ec);">
+
+    <VBox spacing="25" alignment="CENTER" prefWidth="600" prefHeight="400" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+
+        <!-- App Title -->
+        <Label text="Attendance Tracker" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2b2d42;"/>
+
+        <!-- Welcome Message -->
+        <Label text="Welcome! Please select your role:" style="-fx-font-size: 16px; -fx-text-fill: #3a3a3a;"/>
+
+        <!-- Role Selection -->
+        <HBox spacing="30" alignment="CENTER">
+            <Button text="Student" fx:id="studentBtn" onAction="#handleStudent"
+                    style="-fx-background-color: #8d99ae; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 10 20;"/>
+            <Button text="Teacher" fx:id="teacherBtn" onAction="#handleTeacher"
+                    style="-fx-background-color: #ef233c; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 10 20;"/>
+        </HBox>
+
+        <!-- Login / Signup Options -->
+        <HBox spacing="30" alignment="CENTER" fx:id="loginSignupBox" visible="false">
+            <Button text="Login" fx:id="loginBtn" onAction="#handleLogin"
+                    style="-fx-background-color: #2b2d42; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 10 20;"/>
+            <Button text="Signup" fx:id="signupBtn" onAction="#handleSignup"
+                    style="-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 10 20;"/>
+        </HBox>
+
+    </VBox>
+</AnchorPane>

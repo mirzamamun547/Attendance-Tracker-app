@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.myapp.signup"
+            prefHeight="400.0" prefWidth="600.0"
+            style="-fx-font-family: 'Segoe UI';">
+
+    <children>
+        <VBox alignment="CENTER" spacing="20"
+              AnchorPane.leftAnchor="0"
+              AnchorPane.rightAnchor="0"
+              AnchorPane.topAnchor="0"
+              AnchorPane.bottomAnchor="0">
+
+            <!-- Title -->
+            <Label text="Create Account"
+                   style="-fx-font-size: 28px; -fx-font-weight: bold;" />
+
+            <!-- Card -->
+            <VBox spacing="10"
+                  style="-fx-padding: 25;
+                         -fx-background-radius: 15;
+                         -fx-background-color: rgba(255,255,255,0.85);
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);
+                         -fx-min-width: 350px;">
+
+                <!-- Inputs -->
+                <TextField fx:id="nameField"
+                           promptText="Full Name"
+                           style="-fx-background-radius: 10; -fx-padding: 10;" />
+
+                <TextField fx:id="emailField"
+                           promptText="Email"
+                           style="-fx-background-radius: 10; -fx-padding: 10;" />
+
+                <PasswordField fx:id="passwordField"
+                               promptText="Password"
+                               style="-fx-background-radius: 10; -fx-padding: 10;" />
+
+                <PasswordField fx:id="confirmPasswordField"
+                               promptText="Confirm Password"
+                               style="-fx-background-radius: 10; -fx-padding: 10;" />
+
+                <!-- Signup Button -->
+                <Button text="Sign Up"
+                        onAction="#handleSignup"
+                        style="-fx-background-color: #4C84FF;
+                               -fx-text-fill: white;
+                               -fx-padding: 10;
+                               -fx-background-radius: 10;
+                               -fx-font-weight: bold;" />
+
+                <!-- Login Switch -->
+                <Hyperlink text="Already have an account?" onAction="#goToLogin"/>
+
+            </VBox>
+
+        </VBox>
+    </children>
+
+</AnchorPane>
