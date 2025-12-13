@@ -16,11 +16,11 @@
               AnchorPane.topAnchor="0"
               AnchorPane.bottomAnchor="0">
 
-            <!-- Title -->
+
             <Label text="Create Account"
                    style="-fx-font-size: 28px; -fx-font-weight: bold;" />
 
-            <!-- Card -->
+
             <VBox spacing="10"
                   style="-fx-padding: 25;
                          -fx-background-radius: 15;
@@ -28,7 +28,6 @@
                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.2, 0, 4);
                          -fx-min-width: 350px;">
 
-                <!-- Inputs -->
                 <TextField fx:id="nameField"
                            promptText="Full Name"
                            style="-fx-background-radius: 10; -fx-padding: 10;" />
@@ -45,7 +44,7 @@
                                promptText="Confirm Password"
                                style="-fx-background-radius: 10; -fx-padding: 10;" />
 
-                <!-- Signup Button -->
+
                 <Button text="Sign Up"
                         onAction="#handleSignup"
                         style="-fx-background-color: #4C84FF;
@@ -54,7 +53,7 @@
                                -fx-background-radius: 10;
                                -fx-font-weight: bold;" />
 
-                <!-- Login Switch -->
+
                 <Hyperlink text="Already have an account?" onAction="#goToLogin"/>
 
             </VBox>

@@ -31,11 +31,11 @@
         <Label style="-fx-font-size: 28px; -fx-font-weight: bold;" text="Attendance Tracker" textFill="#cf8b8b" />
 
 
-        <Label style="-fx-font-size: 16px; -fx-text-fill: #ffffff;" text="Welcome! Please select your role:" />
+        <Label style="-fx-font-size: 16px;" text="Welcome! Please select your role:" textFill="#6cb492" />
 
 
         <HBox alignment="CENTER" spacing="30">
-            <Button fx:id="studentBtn" onAction="#handleStudent" style="-fx-background-color: #8d99ae; -fx-text-fill: white; -fx-font-size: 14px;                            -fx-background-radius: 8; -fx-padding: 10 20;" text="Student" />
+            <Button fx:id="studentBtn" onAction="#handleStudent" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 10 20;" text="Student" textFill="#a15858" />
             <Button fx:id="teacherBtn" onAction="#handleTeacher" style="-fx-background-color: #ef233c; -fx-text-fill: white; -fx-font-size: 14px;                            -fx-background-radius: 8; -fx-padding: 10 20;" text="Teacher" />
         </HBox>
 

@@ -3,12 +3,15 @@ package com.example.myapp;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class login {
 
@@ -23,6 +26,20 @@ public class login {
 
     private String userType;
 
+
+    public void back(ActionEvent event) throws IOException {
+
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("hello-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+
+        login loginController = fxmlLoader.getController();
+       // loginController.setUserType("Student");
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(scene);
+      //  stage.setTitle("Login");
+        stage.show();
+    }
 
     public void setUserType(String type) {
         this.userType = type;

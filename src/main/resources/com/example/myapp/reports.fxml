@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane style="-fx-font-family: 'Segoe UI'; -fx-background-color: #f5f7fb;"
+            xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/25"
+            fx:controller="com.example.myapp.HelloController">
+
+    <!-- ================= SIDEBAR ================= -->
+    <left>
+        <VBox spacing="20" style="-fx-background-color: #1e3a8a;">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;" text="Teacher Panel" />
+
+            <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="Dashboard" />
+            <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="Take Attendance" />
+            <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="Reports" />
+            <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="Logout" />
+        </VBox>
+    </left>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <center>
+        <VBox spacing="20">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!-- Title -->
+            <Label text="Attendance Reports" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+            <!-- Filter Row -->
+            <HBox spacing="15">
+                <Label text="Class:" style="-fx-font-size: 14px;"/>
+                <ComboBox fx:id="classFilter" prefWidth="150"/>
+
+                <Label text="Date:" style="-fx-font-size: 14px;"/>
+                <DatePicker fx:id="dateFilter"/>
+
+                <Button fx:id="filterBtn" text="Filter"
+                        style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20;"/>
+            </HBox>
+
+            <!-- Report Table -->
+            <TableView fx:id="reportTable" prefHeight="400"
+                       style="-fx-background-radius: 10; -fx-border-radius: 10;">
+                <columns>
+                    <TableColumn fx:id="rollCol" text="Roll No" prefWidth="100"/>
+                    <TableColumn fx:id="nameCol" text="Name" prefWidth="250"/>
+                    <TableColumn fx:id="statusCol" text="Status" prefWidth="100"/>
+                </columns>
+            </TableView>
+
+            <!-- Export Button -->
+            <Button fx:id="exportBtn" text="Export Report"
+                    style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20;"/>
+        </VBox>
+    </center>
+</BorderPane>
