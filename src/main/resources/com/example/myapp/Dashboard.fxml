@@ -1,55 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane style="-fx-font-family: 'Segoe UI'; -fx-background-color: #f5f7fb;"
-            xmlns:fx="http://javafx.com/fxml/1"
-            xmlns="http://javafx.com/javafx/25"
-            fx:controller="com.example.myapp.DashboardController">
+<BorderPane style="-fx-font-family: 'Segoe UI'; -fx-background-color: #f5f7fb;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.myapp.DashboardController">
 
-    <!-- ================= SIDEBAR ================= -->
+
     <left>
         <VBox spacing="20" style="-fx-background-color: #1e3a8a;">
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets bottom="20" left="20" right="20" top="20" />
             </padding>
 
             <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;" text="Teacher Panel" />
 
-            <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="Dashboard" />
-            <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="Take Attendance" />
-            <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="Reports" />
-            <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="Logout" />
+            <Button
+                    fx:id="dashboardBtn"
+                    text="Dashboard"
+
+                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
+
+            <Button
+                    fx:id="takeAttendanceBtn"
+                    text="Take Attendance"
+                    onAction="#openAttendance"
+                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
+
+            <Button
+                    fx:id="reportsBtn"
+                    text="Reports"
+                    onAction="#openReports"
+                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
+
+            <Button
+                    fx:id="logoutBtn"
+                    text="Logout"
+                    onAction="#logout"
+                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
+
         </VBox>
     </left>
 
-    <!-- ================= MAIN CONTENT ================= -->
+
     <center>
         <VBox spacing="20">
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets bottom="20" left="20" right="20" top="20" />
             </padding>
 
-            <!-- Dashboard Title -->
-            <Label text="Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
 
-            <!-- Top Buttons -->
+            <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Dashboard" />
+
+
             <HBox spacing="10">
-                <Button fx:id="addStudentBtn" text="Add Student"
-                        style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20;" />
-                <Button fx:id="deleteStudentBtn" text="Delete Student"
-                        style="-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20;" />
+                <Button fx:id="addStudentBtn" style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20;" text="Add Student" />
+                <Button fx:id="deleteStudentBtn" style="-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20;" text="Delete Student" />
             </HBox>
 
-            <!-- Student Table -->
-            <TableView fx:id="studentTable" prefHeight="400"
-                       style="-fx-background-radius: 10; -fx-border-radius: 10;">
+
+            <TableView fx:id="studentTable" prefHeight="400" style="-fx-background-radius: 10; -fx-border-radius: 10;">
                 <columns>
-                    <TableColumn fx:id="rollCol" text="Roll No" prefWidth="100"/>
-                    <TableColumn fx:id="nameCol" text="Name" prefWidth="250"/>
-                    <TableColumn fx:id="presentCol" text="Present" prefWidth="100"/>
+                    <TableColumn fx:id="rollCol" prefWidth="100" text="Roll No" />
+                    <TableColumn fx:id="nameCol" prefWidth="174.3999481201172" text="Name" />
+                    <TableColumn fx:id="presentCol" prefWidth="132.80001831054688" text="Present" />
+               <TableColumn prefWidth="119.20001220703125" text="Class" />
                 </columns>
             </TableView>
 

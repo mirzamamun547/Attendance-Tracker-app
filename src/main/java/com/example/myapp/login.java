@@ -5,13 +5,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
-
-import java.io.IOException;
 
 public class login {
 
@@ -26,26 +21,9 @@ public class login {
 
     private String userType;
 
-
-    public void back(ActionEvent event) throws IOException {
-
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-
-        login loginController = fxmlLoader.getController();
-       // loginController.setUserType("Student");
-
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(scene);
-      //  stage.setTitle("Login");
-        stage.show();
-    }
-
     public void setUserType(String type) {
         this.userType = type;
-        if (userTypeLabel != null) {
-            userTypeLabel.setText(type + " Login");
-        }
+        userTypeLabel.setText(type + " Login");
     }
 
     @FXML
@@ -59,40 +37,66 @@ public class login {
             return;
         }
 
+        boolean success = UserDAO.login(email, password, userType);
 
-        if (userType.equals("Student")) {
-            if (email.equals("student@gmail.com") && password.equals("1234")) {
-                showAlert("Success", "Student Login Successful!");
-                //student
-            } else {
-                showAlert("Error", "Invalid email or password!");
+        if (success) {
+            showAlert("Success", "Login Successful!");
+
+            try {
+                FXMLLoader loader;
+                if ("Student".equalsIgnoreCase(userType)) {
+
+                    loader = new FXMLLoader(getClass().getResource("student.fxml"));
+                } else {
+
+                    loader = new FXMLLoader(getClass().getResource("Dashboard.fxml"));
+                }
+
+                Scene scene = new Scene(loader.load());
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(scene);
+                stage.show();
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } else if (userType.equals("Teacher")) {
-            if (email.equals("teacher@gmail.com") && password.equals("1234")) {
-                showAlert("Success", "Teacher Login Successful!");
-                // teacher
-            } else {
-                showAlert("Error", "Invalid email or password!");
-            }
+
+        } else {
+            showAlert("Error", "Invalid email or password!");
+        }
+    }
+
+    @FXML
+    public void back(ActionEvent event) {
+        try {
+            FXMLLoader loader =
+                    new FXMLLoader(getClass().getResource("hello-view.fxml"));
+
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
 
     @FXML
     private void goToSignup(ActionEvent event) {
-        if ("Teacher".equals(userType)) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/signup.fxml"));
-                Stage stage = (Stage) emailField.getScene().getWindow();
-                stage.setScene(new Scene(loader.load()));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
+        if (!"Teacher".equals(userType)) {
             showAlert("Error", "Students cannot signup!");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/signup.fxml"));
+            Stage stage = (Stage) emailField.getScene().getWindow();
+            stage.setScene(new Scene(loader.load()));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-
 
     private void showAlert(String title, String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

@@ -22,10 +22,29 @@
 
             <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;" text="Teacher Panel" />
 
-            <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="Dashboard" />
-            <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="Take Attendance" />
-            <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="Reports" />
-            <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="Logout" />
+            <Button
+                    fx:id="dashboardBtn"
+                    text="Dashboard"
+                    onAction="#openDashboard"
+                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
+
+            <Button
+                    fx:id="takeAttendanceBtn"
+                    text="Take Attendance"
+
+                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
+
+            <Button
+                    fx:id="reportsBtn"
+                    text="Reports"
+                    onAction="#openReports"
+                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
+
+            <Button
+                    fx:id="logoutBtn"
+                    text="Logout"
+                    onAction="#logout"
+                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
         </VBox>
     </left>
 

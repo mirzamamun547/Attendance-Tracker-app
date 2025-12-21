@@ -2,10 +2,19 @@ package com.example.myapp;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.stage.Stage;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.time.LocalDate;
 
 public class attendanceController {
@@ -27,82 +36,147 @@ public class attendanceController {
 
     private final ObservableList<Student> students = FXCollections.observableArrayList();
 
-
     @FXML
     public void initialize() {
 
         classBox.getItems().addAll("Class 1", "Class 2", "Class 3");
 
+        rollCol.setCellValueFactory(c -> c.getValue().rollNoProperty());
+        nameCol.setCellValueFactory(c -> c.getValue().nameProperty());
 
-        rollCol.setCellValueFactory(cell -> cell.getValue().rollNoProperty());
-        nameCol.setCellValueFactory(cell -> cell.getValue().nameProperty());
-
-
-        presentCol.setCellValueFactory(cell -> cell.getValue().presentProperty());
+        presentCol.setCellValueFactory(c -> c.getValue().presentProperty());
         presentCol.setCellFactory(CheckBoxTableCell.forTableColumn(presentCol));
-        presentCol.setEditable(true);
-
 
         tableView.setEditable(true);
-
-
         tableView.setItems(students);
 
-
         classBox.setOnAction(e -> loadStudentsForClass(classBox.getValue()));
-
-
         saveBtn.setOnAction(e -> saveAttendance());
     }
 
     private void loadStudentsForClass(String className) {
+
         students.clear();
 
+        String sql = "SELECT id, roll_no, name FROM students WHERE class=?";
 
-        if ("Class 1".equals(className)) {
-            students.addAll(
-                    new Student("101", "Alice", false),
-                    new Student("102", "Bob", false),
-                    new Student("103", "Charlie", false)
-            );
-        } else if ("Class 2".equals(className)) {
-            students.addAll(
-                    new Student("201", "David", false),
-                    new Student("202", "Eve", false)
-            );
-        } else {
-            students.addAll(
-                    new Student("301", "Frank", false)
-            );
+        try (Connection con = DButil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, className);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    students.add(new Student(
+                            rs.getInt("id"),
+                            rs.getString("roll_no"),
+                            rs.getString("name"),
+                            false
+                    ));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @FXML
+    private void openDashboard(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/myapp/Dashboard.fxml"));
+
+            Parent root = loader.load();
+
+
+            Stage stage = (Stage) ((Node) event.getSource())
+                    .getScene().getWindow();
+
+
+            stage.setScene(new Scene(root));
+            stage.setTitle("Dashboard");
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @FXML
+    private void logout(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/myapp/hello-view.fxml"));
+
+            Parent root = loader.load();
+
+
+            Stage stage = (Stage) ((Node) event.getSource())
+                    .getScene().getWindow();
+
+
+            stage.setScene(new Scene(root));
+            stage.setTitle("LOG OUT");
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @FXML
+    private void openReports(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/myapp/reports.fxml"));
+
+            Parent root = loader.load();
+
+
+            Stage stage = (Stage) ((Node) event.getSource())
+                    .getScene().getWindow();
+
+
+            stage.setScene(new Scene(root));
+            stage.setTitle("Reports");
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-
     private void saveAttendance() {
+
         LocalDate date = datePicker.getValue();
         String className = classBox.getValue();
 
-        if (className == null || date == null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Please select class and date.", ButtonType.OK);
-            alert.showAndWait();
+        if (date == null || className == null) {
+            new Alert(Alert.AlertType.WARNING,
+                    "Please select class and date").show();
             return;
         }
 
-        StringBuilder report = new StringBuilder();
-        report.append("Attendance for ").append(className).append(" on ").append(date).append(":\n");
+        String sql = """
+                INSERT INTO attendance (student_id, date, present)
+                VALUES (?, ?, ?)
+                """;
 
-        for (Student student : students) {
-            report.append(student.getRollNo())
-                    .append(" - ")
-                    .append(student.getName())
-                    .append(" : ")
-                    .append(student.isPresent() ? "Present" : "Absent")
-                    .append("\n");
+        try (Connection con = DButil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            for (Student s : students) {
+                ps.setInt(1, s.getId());
+                ps.setString(2, date.toString());
+                ps.setInt(3, s.isPresent() ? 1 : 0);
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+            new Alert(Alert.AlertType.INFORMATION,
+                    "Attendance saved successfully").show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, report.toString(), ButtonType.OK);
-        alert.setHeaderText("Attendance Saved");
-        alert.showAndWait();
     }
 }
+

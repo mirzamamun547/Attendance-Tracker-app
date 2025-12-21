@@ -4,24 +4,16 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 public class signup {
-    @FXML
-    private TextField nameField;
 
     @FXML
-    private TextField emailField;
+    private TextField nameField, emailField;
 
     @FXML
-    private PasswordField passwordField;
-
-    @FXML
-    private PasswordField confirmPasswordField;
-
+    private PasswordField passwordField, confirmPasswordField;
 
     @FXML
     private void handleSignup(ActionEvent event) {
@@ -41,12 +33,15 @@ public class signup {
             return;
         }
 
-        // database ee add korbo pore
-        showAlert("Success", "Account created successfully!");
+        boolean success = UserDAO.register(name, email, pass, "Teacher");
 
-        goToLogin(null);
+        if (success) {
+            showAlert("Success", "Account created!");
+            goToLogin(null);
+        } else {
+            showAlert("Error", "Email already exists!");
+        }
     }
-
 
     @FXML
     private void goToLogin(ActionEvent event) {
@@ -58,7 +53,6 @@ public class signup {
             e.printStackTrace();
         }
     }
-
 
     private void showAlert(String title, String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
