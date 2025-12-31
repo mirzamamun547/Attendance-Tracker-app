@@ -109,7 +109,6 @@ public class StudentController {
             if (selectedClass != null) loadAttendanceForClass(selectedClass);
         });
     }
-
     private void loadAttendanceForClass(String className) {
         attendanceList.clear();
         Integer classId = classMap.get(className);
@@ -126,8 +125,7 @@ public class StudentController {
             ps.setInt(2, classId);
             ResultSet rs = ps.executeQuery();
 
-            LocalDate today = LocalDate.now();
-            boolean todayAbsent = false;
+            boolean hasUnexplainedAbsence = false;
 
             while (rs.next()) {
                 String date = rs.getString("date");
@@ -137,13 +135,20 @@ public class StudentController {
 
                 attendanceList.add(new AttendanceRecord(date, status, remarks));
 
-                if (date.equals(today.toString()) && !present) {
-                    todayAbsent = true;
+                // ✅ Enable reason field if any absence without remarks
+                if (!present && (remarks.isEmpty() || remarks.isBlank())) {
+                    hasUnexplainedAbsence = true;
                 }
             }
 
-            absenceReasonArea.setDisable(!todayAbsent);
-            submitReasonButton.setDisable(!todayAbsent);
+            absenceReasonArea.setDisable(!hasUnexplainedAbsence);
+            submitReasonButton.setDisable(!hasUnexplainedAbsence);
+
+            if (hasUnexplainedAbsence) {
+                System.out.println("Student has unexplained absence(s). Reason field enabled.");
+            } else {
+                System.out.println("No unexplained absences. Reason field disabled.");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -157,6 +162,17 @@ public class StudentController {
             return;
         }
 
+        AttendanceRecord selectedRecord = attendanceTable.getSelectionModel().getSelectedItem();
+        if (selectedRecord == null) {
+            new Alert(Alert.AlertType.WARNING, "Please select an absence record from the table").show();
+            return;
+        }
+
+        if ("Present".equalsIgnoreCase(selectedRecord.getStatus())) {
+            new Alert(Alert.AlertType.WARNING, "You can only submit a reason for absences").show();
+            return;
+        }
+
         String selectedClass = classBox.getValue();
         Integer classId = classMap.get(selectedClass);
         if (classId == null) {
@@ -164,7 +180,6 @@ public class StudentController {
             return;
         }
 
-        LocalDate today = LocalDate.now();
         String sql = "UPDATE attendance SET remarks=? " +
                 "WHERE student_id=? AND class_id=? AND date=? AND present=0";
 
@@ -174,7 +189,7 @@ public class StudentController {
             ps.setString(1, reason);
             ps.setInt(2, studentId);
             ps.setInt(3, classId);
-            ps.setString(4, today.toString());
+            ps.setString(4, selectedRecord.getDate()); // ✅ use selected row’s date
 
             int updated = ps.executeUpdate();
             if (updated > 0) {
@@ -182,13 +197,14 @@ public class StudentController {
                 absenceReasonArea.clear();
                 loadAttendanceForClass(selectedClass);
             } else {
-                new Alert(Alert.AlertType.WARNING, "You are either marked present or no attendance record for today").show();
+                new Alert(Alert.AlertType.WARNING, "No matching absence record found").show();
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     private void exportAttendance() {
         FileChooser fileChooser = new FileChooser();
