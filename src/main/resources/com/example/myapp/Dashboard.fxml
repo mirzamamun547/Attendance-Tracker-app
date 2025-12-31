@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.DatePicker?>
 <BorderPane style="-fx-font-family: 'Segoe UI'; -fx-background-color: #f5f7fb;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.myapp.DashboardController">
 
 
@@ -61,6 +62,11 @@
             <HBox spacing="10">
                 <Button fx:id="addStudentBtn" style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20;" text="Add Student" />
                 <Button fx:id="deleteStudentBtn" style="-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20;" text="Delete Student" />
+            </HBox>
+            <HBox spacing="10">
+                <Label text="Select Date:" />
+                <DatePicker fx:id="datePicker" />
+                <Button text="Load Attendance" onAction="#loadAttendanceByDate"/>
             </HBox>
 
 

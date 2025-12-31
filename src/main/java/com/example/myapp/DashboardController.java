@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Random;
 
@@ -30,6 +31,9 @@ public class DashboardController {
     @FXML private TableColumn<Student, Boolean> presentCol;
     @FXML private Button addStudentBtn;
     @FXML private Button deleteStudentBtn;
+    @FXML
+    private DatePicker datePicker;
+
 
     private final ObservableList<Student> studentList = FXCollections.observableArrayList();
     private final ObservableList<String> classes = FXCollections.observableArrayList("Class 1","Class 2","Class 3");
@@ -40,12 +44,63 @@ public class DashboardController {
         nameCol.setCellValueFactory(c -> c.getValue().nameProperty());
         presentCol.setCellValueFactory(c -> c.getValue().presentProperty());
         presentCol.setCellFactory(CheckBoxTableCell.forTableColumn(presentCol));
-        studentTable.setEditable(true);
+        studentTable.setEditable(false);
+
+
+
+
+
+
+
+
         studentTable.setItems(studentList);
         loadStudents();
         addStudentBtn.setOnAction(e -> addStudent());
         deleteStudentBtn.setOnAction(e -> deleteSelectedStudent());
     }
+
+
+
+    @FXML
+    private void loadAttendanceByDate() {
+
+        LocalDate date = datePicker.getValue();
+        if (date == null) {
+            new Alert(Alert.AlertType.WARNING, "Please select a date").show();
+            return;
+        }
+
+        studentList.clear();
+
+        String sql = """
+        SELECT s.id, s.roll_no, s.name,
+               COALESCE(a.present, 0) AS present
+        FROM students s
+        LEFT JOIN attendance a
+        ON s.id = a.student_id AND a.date = ?
+        """;
+
+        try (Connection con = DButil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, date.toString());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    studentList.add(new Student(
+                            rs.getInt("id"),
+                            rs.getString("roll_no"),
+                            rs.getString("name"),
+                            rs.getInt("present") == 1
+                    ));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @FXML
     private void openAttendance(ActionEvent event) {
         try {
