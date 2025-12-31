@@ -1,9 +1,11 @@
 package com.example.myapp;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class UserDAO {
-
 
     public static boolean register(String name, String email, String password, String role) {
         String sql = "INSERT INTO users(name,email,password,role) VALUES(?,?,?,?)";
@@ -22,39 +24,38 @@ public class UserDAO {
             e.printStackTrace();
             return false;
         }
-
     }
 
-
-    public static boolean login(String email, String password, String role) {
+    public static Integer login(String email, String password, String role) {
         String sql;
-
         if ("Student".equalsIgnoreCase(role)) {
-
-            sql = "SELECT * FROM students WHERE email=? AND password=?";
+            sql = "SELECT id FROM students WHERE email=? AND password=?";
+        } else if ("Teacher".equalsIgnoreCase(role)) {
+            sql = "SELECT id FROM users WHERE email=? AND password=? AND role=?";
         } else {
-
-            sql = "SELECT * FROM users WHERE email=? AND password=? AND role=?";
+            return null;
         }
 
-        try (Connection conn = DButil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        try (Connection con = DButil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, email);
             ps.setString(2, password);
 
-            if (!"Student".equalsIgnoreCase(role)) {
-                ps.setString(3, role);
+            if ("Teacher".equalsIgnoreCase(role)) {
+                ps.setString(3, role); // only for teacher
             }
 
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id"); // return user ID
             }
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
-    }
 
+        return null; // login failed
+    }
 }
