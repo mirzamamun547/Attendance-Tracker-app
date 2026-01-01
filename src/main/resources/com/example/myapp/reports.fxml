@@ -9,74 +9,49 @@
             xmlns="http://javafx.com/javafx/25"
             fx:controller="com.example.myapp.reportsController">
 
-
     <left>
         <VBox spacing="20" style="-fx-background-color: #1e3a8a;">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
-
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
             <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;" text="Teacher Panel" />
-
-            <Button
-                    fx:id="dashboardBtn"
-                    text="Dashboard"
-                    onAction="#openDashboard"
+            <Button fx:id="dashboardBtn" text="Dashboard" onAction="#openDashboard"
                     style="-fx-background-color: transparent; -fx-text-fill: white;" />
-
-            <Button
-                    fx:id="takeAttendanceBtn"
-                    text="Take Attendance"
-                    onAction="#openAttendance"
+            <Button fx:id="takeAttendanceBtn" text="Take Attendance" onAction="#openAttendance"
                     style="-fx-background-color: transparent; -fx-text-fill: white;" />
-
-            <Button
-                    fx:id="reportsBtn"
-                    text="Reports"
-
+            <Button fx:id="reportsBtn" text="Reports"
                     style="-fx-background-color: transparent; -fx-text-fill: white;" />
-
-            <Button
-                    fx:id="logoutBtn"
-                    text="Logout"
-                    onAction="#logout"
+            <Button fx:id="logoutBtn" text="Logout" onAction="#logout"
                     style="-fx-background-color: transparent; -fx-text-fill: white;" />
-
         </VBox>
     </left>
 
-
     <center>
         <VBox spacing="20">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
-
-
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
             <Label text="Attendance Reports" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-
 
             <HBox spacing="15">
                 <Label text="Class:" style="-fx-font-size: 14px;"/>
                 <ComboBox fx:id="classFilter" prefWidth="150"/>
-
                 <Label text="Date:" style="-fx-font-size: 14px;"/>
                 <DatePicker fx:id="dateFilter"/>
-
                 <Button fx:id="filterBtn" text="Filter"
                         style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20;"/>
             </HBox>
 
+            <!-- ✅ Card container -->
+            <ScrollPane fitToWidth="true" prefHeight="400">
+                <content>
+                    <VBox fx:id="reportCards" spacing="15">
+                        <VBox spacing="15">
+                            <padding>
+                                <Insets top="10" right="20" bottom="10" left="20"/>
+                            </padding>
+                        </VBox>
 
-            <TableView fx:id="reportTable" prefHeight="400"
-                       style="-fx-background-radius: 10; -fx-border-radius: 10;">
-                <columns>
-                    <TableColumn fx:id="rollCol" text="Roll No" prefWidth="100"/>
-                    <TableColumn fx:id="nameCol" text="Name" prefWidth="250"/>
-                    <TableColumn fx:id="statusCol" text="Status" prefWidth="100"/>
-                </columns>
-            </TableView>
-
+                        <style>-fx-background-color: transparent;</style>
+                    </VBox>
+                </content>
+            </ScrollPane>
 
             <Button fx:id="exportBtn" text="Export Report"
                     style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20;"/>

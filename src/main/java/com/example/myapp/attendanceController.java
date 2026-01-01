@@ -18,7 +18,6 @@ import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-
 public class attendanceController {
 
     @FXML private ComboBox<String> classBox;
@@ -82,11 +81,18 @@ public class attendanceController {
         Integer classId = classMap.get(className);
         if (classId == null) return;
 
-        String sql = "SELECT id, roll_no, name FROM students WHERE teacher_id=? AND class_id=?";
+        // ✅ FIX: filter by class’s teacher_id, not student’s
+        String sql = "SELECT s.id, s.roll_no, s.name " +
+                "FROM students s " +
+                "JOIN student_classes sc ON s.id = sc.student_id " +
+                "JOIN classes c ON sc.class_id = c.id " +
+                "WHERE sc.class_id=? AND c.teacher_id=?";
+
         try (Connection con = DButil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, currentTeacherId);
-            ps.setInt(2, classId);
+            ps.setInt(1, classId);
+            ps.setInt(2, currentTeacherId);
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 students.add(new Student(
@@ -127,7 +133,7 @@ public class attendanceController {
                 ps.setInt(2, classId);
                 ps.setString(3, date.toString());
                 ps.setInt(4, s.isPresent() ? 1 : 0);
-                ps.setInt(5, s.isPresent() ? 1 : 0); // update on conflict
+                ps.setInt(5, s.isPresent() ? 1 : 0);
                 ps.addBatch();
             }
 
@@ -138,13 +144,15 @@ public class attendanceController {
             e.printStackTrace();
         }
     }
+
+    // Navigation
     @FXML
     private void openDashboard(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/myapp/Dashboard.fxml"));
             Parent root = loader.load();
             DashboardController controller = loader.getController();
-            controller.setCurrentTeacherId(currentTeacherId); // ✅ pass teacher ID
+            controller.setCurrentTeacherId(currentTeacherId);
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -160,7 +168,6 @@ public class attendanceController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/myapp/hello-view.fxml"));
             Parent root = loader.load();
-            // ❌ no teacher ID needed here, since logout clears session
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -176,14 +183,15 @@ public class attendanceController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/myapp/reports.fxml"));
             Parent root = loader.load();
-            DashboardController controller = loader.getController();
-            controller.setCurrentTeacherId(currentTeacherId); // ✅ pass teacher ID
+            reportsController controller = loader.getController();
+            controller.setCurrentTeacherId(currentTeacherId);
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("reports");
+            stage.setTitle("Reports");
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }}
+    }
+}

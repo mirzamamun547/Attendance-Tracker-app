@@ -29,22 +29,31 @@ public class DBinit {
             );
         """;
 
-        // STUDENTS
+        // STUDENTS (basic info, no longer tied to one class only)
         String studentTable = """
             CREATE TABLE IF NOT EXISTS students (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 teacher_id INTEGER NOT NULL,
-                class_id INTEGER NOT NULL,
                 roll_no TEXT,
                 name TEXT,
                 email TEXT UNIQUE,
                 password TEXT,
-                FOREIGN KEY (teacher_id) REFERENCES users(id),
+                FOREIGN KEY (teacher_id) REFERENCES users(id)
+            );
+        """;
+
+        // STUDENT_CLASSES (join table for many-to-many relationship)
+        String studentClassesTable = """
+            CREATE TABLE IF NOT EXISTS student_classes (
+                student_id INTEGER NOT NULL,
+                class_id INTEGER NOT NULL,
+                PRIMARY KEY (student_id, class_id),
+                FOREIGN KEY (student_id) REFERENCES students(id),
                 FOREIGN KEY (class_id) REFERENCES classes(id)
             );
         """;
 
-        // ATTENDANCE (with class_id and remarks)
+        // ATTENDANCE (linked to student + class, with remarks)
         String attendanceTable = """
             CREATE TABLE IF NOT EXISTS attendance (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -65,6 +74,7 @@ public class DBinit {
             stmt.execute(userTable);
             stmt.execute(classTable);
             stmt.execute(studentTable);
+            stmt.execute(studentClassesTable);   // ✅ now included
             stmt.execute(attendanceTable);
 
             System.out.println("✅ Database initialized successfully!");

@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class DButil {
 
-    private static final String URL = "jdbc:sqlite:attendance5.db";
+    private static final String URL = "jdbc:sqlite:attendance7.db";
 
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL);

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/25"
+            fx:controller="com.example.myapp.ReportCardController"
+            style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 15;
+                   -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5,0,0,2);">
+
+    <top>
+        <Label fx:id="rollLabel" style="-fx-font-weight: bold; -fx-font-size: 16;"/>
+    </top>
+
+    <center>
+        <VBox spacing="5">
+            <Label fx:id="nameLabel" style="-fx-font-size: 14;"/>
+            <Label fx:id="statusLabel" style="-fx-font-size: 14;"/>
+        </VBox>
+    </center>
+</BorderPane>

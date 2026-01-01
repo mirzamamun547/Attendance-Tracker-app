@@ -14,10 +14,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -43,13 +40,17 @@ public class DashboardController {
         String sql = """
         SELECT s.id, s.roll_no, s.name, c.class_name
         FROM students s
-        JOIN classes c ON s.class_id = c.id
-        WHERE s.teacher_id = ?
+        JOIN student_classes sc ON s.id = sc.student_id
+        JOIN classes c ON sc.class_id = c.id
+        WHERE c.teacher_id = ?
     """;
+
         try (Connection con = DButil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setInt(1, currentTeacherId);
             ResultSet rs = ps.executeQuery();
+
             while (rs.next()) {
                 studentList.add(new Student(
                         rs.getInt("id"),
@@ -202,20 +203,68 @@ public class DashboardController {
             new Alert(Alert.AlertType.INFORMATION, "Email: " + email + "\nPassword: " + password).show();
         });
     }
-
     private void insertStudent(int teacherId, int classId, String roll, String name, String email, String password) {
-        String sql = "INSERT INTO students (teacher_id, class_id, roll_no, name, email, password) VALUES (?,?,?,?,?,?)";
+        String checkSql = "SELECT id FROM students WHERE roll_no=? AND name=?";
         try (Connection conn = DButil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, teacherId);
-            ps.setInt(2, classId);
-            ps.setString(3, roll);
-            ps.setString(4, name);
-            ps.setString(5, email);
-            ps.setString(6, password);
-            ps.executeUpdate();
+             PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
+
+            checkPs.setString(1, roll);
+            checkPs.setString(2, name);
+            ResultSet rs = checkPs.executeQuery();
+
+            int studentId;
+            if (rs.next()) {
+                // Student already exists → reuse their ID
+                studentId = rs.getInt("id");
+                System.out.println("Existing student found: " + name + " (" + roll + ")");
+            } else {
+                // New student → insert with password
+                String insertSql = "INSERT INTO students (teacher_id, roll_no, name, email, password) VALUES (?,?,?,?,?)";
+                try (PreparedStatement ps = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
+                    ps.setInt(1, teacherId);
+                    ps.setString(2, roll);
+                    ps.setString(3, name);
+                    ps.setString(4, email);
+                    ps.setString(5, password);
+                    ps.executeUpdate();
+                    ResultSet keys = ps.getGeneratedKeys();
+                    keys.next();
+                    studentId = keys.getInt(1);
+                    System.out.println("New student inserted: " + name + " (" + roll + ")");
+                }
+            }
+
+            // ✅ Ensure class exists
+            String classCheckSql = "SELECT id FROM classes WHERE id=?";
+            try (PreparedStatement classCheckPs = conn.prepareStatement(classCheckSql)) {
+                classCheckPs.setInt(1, classId);
+                ResultSet classRs = classCheckPs.executeQuery();
+                if (!classRs.next()) {
+                    String insertClassSql = "INSERT INTO classes (id, teacher_id, class_name) VALUES (?, ?, ?)";
+                    try (PreparedStatement insertClassPs = conn.prepareStatement(insertClassSql)) {
+                        insertClassPs.setInt(1, classId);
+                        insertClassPs.setInt(2, teacherId);
+                        insertClassPs.setString(3, "Class " + classId);
+                        insertClassPs.executeUpdate();
+                        System.out.println("Class added: " + classId);
+                    }
+                }
+            }
+
+            // ✅ Link student to class (no overwrite, no password)
+            String linkSql = "INSERT OR IGNORE INTO student_classes (student_id, class_id) VALUES (?, ?)";
+            try (PreparedStatement linkPs = conn.prepareStatement(linkSql)) {
+                linkPs.setInt(1, studentId);
+                linkPs.setInt(2, classId);
+                linkPs.executeUpdate();
+                System.out.println("Student " + studentId + " linked to class " + classId);
+            }
+
             loadStudents();
-        } catch (SQLException e) { e.printStackTrace(); }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void deleteSelectedStudent() {
