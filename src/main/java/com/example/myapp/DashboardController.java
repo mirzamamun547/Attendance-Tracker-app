@@ -325,13 +325,13 @@ public class DashboardController {
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/myapp/reports.fxml"));
-
             Parent root = loader.load();
 
+            reportsController controller = loader.getController();
+            controller.setCurrentTeacherId(currentTeacherId); // ✅ IMPORTANT
 
             Stage stage = (Stage) ((Node) event.getSource())
                     .getScene().getWindow();
-
 
             stage.setScene(new Scene(root));
             stage.setTitle("Reports");
@@ -341,6 +341,7 @@ public class DashboardController {
             e.printStackTrace();
         }
     }
+
     @FXML
     private void loadAttendanceByDate() {
         LocalDate date = datePicker.getValue();

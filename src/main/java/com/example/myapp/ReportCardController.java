@@ -16,3 +16,4 @@ public class ReportCardController {
         remarksLabel.setText("Reason: " + (remarks == null || remarks.isBlank() ? "—" : remarks));
     }
 }
+

@@ -34,7 +34,7 @@
                 <ComboBox fx:id="classFilter" prefWidth="150"/>
                 <Label text="Date:" style="-fx-font-size: 14px;"/>
                 <DatePicker fx:id="dateFilter"/>
-                <Button fx:id="filterBtn" text="Filter"
+                <Button fx:id="filterBtn" text="Filter" onAction="#filterReports"
                         style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20;"/>
             </HBox>
 

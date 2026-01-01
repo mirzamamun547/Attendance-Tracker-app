@@ -58,11 +58,12 @@ public class login {
 
                     scene = new Scene(root);
                 } else {
-                    loader = new FXMLLoader(getClass().getResource("/com/example/myapp/Dashboard.fxml"));
+                    loader = new FXMLLoader(getClass().getResource("/com/example/myapp/reports.fxml"));
                     root = loader.load();
 
                     // ✅ get controller and pass teacherId
-                    DashboardController controller = loader.getController();
+                    //
+                    reportsController controller = loader.getController();
                     controller.setCurrentTeacherId(userId);
                     System.out.println("Logged-in teacher ID: " + userId);
 
