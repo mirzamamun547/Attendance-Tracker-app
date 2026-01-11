@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 
@@ -34,8 +35,10 @@ public class StudentController {
         @FXML private Button refreshButton;
         @FXML private Button exportButton;
     @FXML private Label attendancePercentLabel;
+    @FXML private PieChart attendancePieChart;
 
-        private int studentId;
+
+    private int studentId;
         private final ObservableList<AttendanceRecord> attendanceList = FXCollections.observableArrayList();
         private final ObservableList<String> classNames = FXCollections.observableArrayList();
         private final Map<String, Integer> classMap = new HashMap<>();
@@ -53,6 +56,8 @@ public class StudentController {
             remarksColumn.setCellValueFactory(c -> c.getValue().remarksProperty());
 
             attendanceTable.setItems(attendanceList);
+            attendancePieChart.setTitle("Attendance Overview");
+            attendancePieChart.setLabelsVisible(true);
 
             submitReasonButton.setOnAction(this::submitReason);
             refreshButton.setOnAction(e -> {
@@ -120,20 +125,22 @@ public class StudentController {
                 }
             });
         }
-
     private void loadAttendanceForClass(String className) {
         attendanceList.clear();
         Integer classId = classMap.get(className);
         if (classId == null) return;
 
-        String sql = "SELECT present, date, remarks FROM attendance " +
-                "WHERE student_id=? AND class_id=? ORDER BY date DESC";
+        String sql = "SELECT date, present, remarks " +
+                "FROM attendance " +
+                "WHERE student_id=? AND class_id=? " +
+                "ORDER BY date DESC";
 
         int totalDays = 0;
         int presentDays = 0;
 
         try (Connection con = DButil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setInt(1, studentId);
             ps.setInt(2, classId);
             ResultSet rs = ps.executeQuery();
@@ -150,7 +157,8 @@ public class StudentController {
 
                 totalDays++;
                 if (present) presentDays++;
-                if (!present && (remarks.isEmpty() || remarks.isBlank())) {
+
+                if (!present && remarks.isBlank()) {
                     hasUnexplainedAbsence = true;
                 }
             }
@@ -158,22 +166,38 @@ public class StudentController {
             absenceReasonArea.setDisable(!hasUnexplainedAbsence);
             submitReasonButton.setDisable(!hasUnexplainedAbsence);
 
-            // ✅ calculate percentage
+            // ✅ Calculate percentage
             double percent = totalDays > 0 ? (presentDays * 100.0 / totalDays) : 0;
-            attendancePercentLabel.setText(String.format("Attendance: %.1f%%", percent));
+            attendancePercentLabel.setText(
+                    String.format("Attendance: %.1f%%", percent)
+            );
 
-            // Optional: warning if below 70%
-            if (percent < 70) {
-                attendancePercentLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
-            } else {
-                attendancePercentLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
-            }
+            attendancePercentLabel.setStyle(
+                    percent < 70
+                            ? "-fx-text-fill: red; -fx-font-weight: bold;"
+                            : "-fx-text-fill: green; -fx-font-weight: bold;"
+            );
+
+            // ✅ Update PieChart
+            updatePieChart(presentDays, totalDays - presentDays);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    private void updatePieChart(int presentDays, int absentDays) {
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
+                new PieChart.Data("Present", presentDays),
+                new PieChart.Data("Absent", absentDays)
+        );
+
+        attendancePieChart.setData(pieData);
+
+        // 🎨 Custom colors
+        pieData.get(0).getNode().setStyle("-fx-pie-color: #2ecc71;");
+        pieData.get(1).getNode().setStyle("-fx-pie-color: #e74c3c;");
+    }
 
     private void submitReason(ActionEvent event) {
             String reason = absenceReasonArea.getText().trim();

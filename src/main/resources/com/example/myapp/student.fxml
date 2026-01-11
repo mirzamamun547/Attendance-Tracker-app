@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
+<?import javafx.scene.chart.PieChart?>
 <BorderPane xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.myapp.StudentController"
@@ -44,17 +45,35 @@
                 <ComboBox fx:id="classBox" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
             </GridPane>
 
-            <TableView fx:id="attendanceTable" prefHeight="250">
-                <placeholder><Label text="No attendance records"/></placeholder>
-                <columns>
-                    <TableColumn fx:id="dateColumn" text="Date" prefWidth="150"/>
-                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
-                    <TableColumn fx:id="remarksColumn" text="Remarks" prefWidth="200"/>
+            <HBox spacing="20" alignment="CENTER_LEFT">
 
 
-                </columns>
-            </TableView>
-            <Label fx:id="attendancePercentLabel" text="Attendance: 0%" />
+                <TableView fx:id="attendanceTable"
+                           prefHeight="250"
+                           prefWidth="450">
+                    <placeholder>
+                        <Label text="No attendance records"/>
+                    </placeholder>
+                    <columns>
+                        <TableColumn fx:id="dateColumn" text="Date" prefWidth="150"/>
+                        <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
+                        <TableColumn fx:id="remarksColumn" text="Remarks" prefWidth="200"/>
+                    </columns>
+                </TableView>
+
+                <!-- Attendance Chart -->
+                <VBox spacing="10" alignment="CENTER">
+                    <Label fx:id="attendancePercentLabel"
+                           text="Attendance: 0%"
+                           style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+                    <PieChart fx:id="attendancePieChart"
+                              prefHeight="200"
+                              prefWidth="200"
+                              legendVisible="true"/>
+                </VBox>
+
+            </HBox>
 
             <VBox spacing="10">
                 <Label text="Reason for Absence:"/>
