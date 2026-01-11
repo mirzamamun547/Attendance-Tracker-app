@@ -341,7 +341,6 @@ public class DashboardController {
             e.printStackTrace();
         }
     }
-
     @FXML
     private void loadAttendanceByDate() {
         LocalDate date = datePicker.getValue();
@@ -353,14 +352,17 @@ public class DashboardController {
         studentList.clear();
 
         String sql = """
-        SELECT s.id, s.roll_no, s.name, c.class_name,
-               COALESCE(a.present, 0) AS present
+        SELECT s.id, s.roll_no, s.name,
+               COALESCE(a.present, 0) AS present,
+               c.class_name
         FROM students s
-        JOIN classes c ON s.class_id = c.id
         LEFT JOIN attendance a
-        ON s.id = a.student_id AND a.date = ?
+               ON s.id = a.student_id AND a.date = ?
+        LEFT JOIN classes c
+               ON a.class_id = c.id
         WHERE s.teacher_id = ?
-        """;
+        ORDER BY s.roll_no
+    """;
 
         try (Connection con = DButil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -375,7 +377,7 @@ public class DashboardController {
                         rs.getString("roll_no"),
                         rs.getString("name"),
                         rs.getInt("present") == 1,
-                        rs.getString("class_name")
+                        rs.getString("class_name") != null ? rs.getString("class_name") : "N/A"
                 ));
             }
 

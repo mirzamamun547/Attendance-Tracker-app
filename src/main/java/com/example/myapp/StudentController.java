@@ -33,6 +33,7 @@ public class StudentController {
         @FXML private Button submitReasonButton;
         @FXML private Button refreshButton;
         @FXML private Button exportButton;
+    @FXML private Label attendancePercentLabel;
 
         private int studentId;
         private final ObservableList<AttendanceRecord> attendanceList = FXCollections.observableArrayList();
@@ -120,46 +121,61 @@ public class StudentController {
             });
         }
 
-        private void loadAttendanceForClass(String className) {
-            attendanceList.clear();
-            Integer classId = classMap.get(className);
-            if (classId == null) return;
+    private void loadAttendanceForClass(String className) {
+        attendanceList.clear();
+        Integer classId = classMap.get(className);
+        if (classId == null) return;
 
-            String sql = "SELECT date, present, remarks " +
-                    "FROM attendance " +
-                    "WHERE student_id=? AND class_id=? " +
-                    "ORDER BY date DESC";
+        String sql = "SELECT present, date, remarks FROM attendance " +
+                "WHERE student_id=? AND class_id=? ORDER BY date DESC";
 
-            try (Connection con = DButil.getConnection();
-                 PreparedStatement ps = con.prepareStatement(sql)) {
-                ps.setInt(1, studentId);
-                ps.setInt(2, classId);
-                ResultSet rs = ps.executeQuery();
+        int totalDays = 0;
+        int presentDays = 0;
 
-                boolean hasUnexplainedAbsence = false;
+        try (Connection con = DButil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, studentId);
+            ps.setInt(2, classId);
+            ResultSet rs = ps.executeQuery();
 
-                while (rs.next()) {
-                    String date = rs.getString("date");
-                    boolean present = rs.getInt("present") == 1;
-                    String status = present ? "Present" : "Absent";
-                    String remarks = rs.getString("remarks") != null ? rs.getString("remarks") : "";
+            boolean hasUnexplainedAbsence = false;
 
-                    attendanceList.add(new AttendanceRecord(date, status, remarks));
+            while (rs.next()) {
+                String date = rs.getString("date");
+                boolean present = rs.getInt("present") == 1;
+                String status = present ? "Present" : "Absent";
+                String remarks = rs.getString("remarks") != null ? rs.getString("remarks") : "";
 
-                    if (!present && (remarks.isEmpty() || remarks.isBlank())) {
-                        hasUnexplainedAbsence = true;
-                    }
+                attendanceList.add(new AttendanceRecord(date, status, remarks));
+
+                totalDays++;
+                if (present) presentDays++;
+                if (!present && (remarks.isEmpty() || remarks.isBlank())) {
+                    hasUnexplainedAbsence = true;
                 }
-
-                absenceReasonArea.setDisable(!hasUnexplainedAbsence);
-                submitReasonButton.setDisable(!hasUnexplainedAbsence);
-
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-        }
 
-        private void submitReason(ActionEvent event) {
+            absenceReasonArea.setDisable(!hasUnexplainedAbsence);
+            submitReasonButton.setDisable(!hasUnexplainedAbsence);
+
+            // ✅ calculate percentage
+            double percent = totalDays > 0 ? (presentDays * 100.0 / totalDays) : 0;
+            attendancePercentLabel.setText(String.format("Attendance: %.1f%%", percent));
+
+            // Optional: warning if below 70%
+            if (percent < 70) {
+                attendancePercentLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+            } else {
+                attendancePercentLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void submitReason(ActionEvent event) {
             String reason = absenceReasonArea.getText().trim();
             if (reason.isEmpty()) {
                 new Alert(Alert.AlertType.WARNING, "Please enter a reason").show();

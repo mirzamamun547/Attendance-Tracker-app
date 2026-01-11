@@ -50,8 +50,11 @@
                     <TableColumn fx:id="dateColumn" text="Date" prefWidth="150"/>
                     <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
                     <TableColumn fx:id="remarksColumn" text="Remarks" prefWidth="200"/>
+
+
                 </columns>
             </TableView>
+            <Label fx:id="attendancePercentLabel" text="Attendance: 0%" />
 
             <VBox spacing="10">
                 <Label text="Reason for Absence:"/>
