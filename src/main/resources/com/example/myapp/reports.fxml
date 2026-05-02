@@ -4,57 +4,43 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane style="-fx-font-family: 'Segoe UI'; -fx-background-color: #f5f7fb;"
-            xmlns:fx="http://javafx.com/fxml/1"
-            xmlns="http://javafx.com/javafx/25"
-            fx:controller="com.example.myapp.reportsController">
+<BorderPane stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/25" fx:controller="com.example.myapp.reportsController">
 
     <left>
-        <VBox spacing="20" style="-fx-background-color: #1e3a8a;">
-            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
-            <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;" text="Teacher Panel" />
-            <Button fx:id="dashboardBtn" text="Dashboard" onAction="#openDashboard"
-                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
-            <Button fx:id="takeAttendanceBtn" text="Take Attendance" onAction="#openAttendance"
-                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
-            <Button fx:id="reportsBtn" text="Reports"
-                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
-            <Button fx:id="logoutBtn" text="Logout" onAction="#logout"
-                    style="-fx-background-color: transparent; -fx-text-fill: white;" />
+        <VBox styleClass="sidebar">
+            <Label styleClass="label" text="Teacher Panel" />
+            <Button fx:id="dashboardBtn" text="Dashboard" onAction="#openDashboard" styleClass="button" />
+            <Button fx:id="takeAttendanceBtn" text="Take Attendance" onAction="#openAttendance" styleClass="button" />
+            <Button fx:id="reportsBtn" text="Reports" styleClass="button" />
+            <Button fx:id="logoutBtn" text="Logout" onAction="#logout" styleClass="button" />
         </VBox>
     </left>
 
     <center>
         <VBox spacing="20">
-            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
-            <Label text="Attendance Reports" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+            <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+            <Label text="Attendance Reports" styleClass="header-label"/>
 
-            <HBox spacing="15">
-                <Label text="Class:" style="-fx-font-size: 14px;"/>
-                <ComboBox fx:id="classFilter" prefWidth="150"/>
-                <Label text="Date:" style="-fx-font-size: 14px;"/>
-                <DatePicker fx:id="dateFilter"/>
-                <Button fx:id="filterBtn" text="Filter" onAction="#filterReports"
-                        style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20;"/>
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Label text="Class:" styleClass="sub-header-label"/>
+                <ComboBox fx:id="classFilter" prefWidth="150" styleClass="combo-box"/>
+                <Label text="Date:" styleClass="sub-header-label"/>
+                <DatePicker fx:id="dateFilter" styleClass="date-picker"/>
+                <Button fx:id="filterBtn" text="Filter" onAction="#filterReports" styleClass="button, btn-primary"/>
             </HBox>
 
-            <!-- ✅ Card container -->
-            <ScrollPane fitToWidth="true" prefHeight="400">
+            <ScrollPane fitToWidth="true" prefHeight="400" style="-fx-background-color: transparent; -fx-background: transparent;">
                 <content>
-                    <VBox fx:id="reportCards" spacing="15">
+                    <VBox fx:id="reportCards" spacing="15" style="-fx-background-color: transparent;">
                         <VBox spacing="15">
                             <padding>
                                 <Insets top="10" right="20" bottom="10" left="20"/>
                             </padding>
                         </VBox>
-
-                        <style>-fx-background-color: transparent;</style>
                     </VBox>
                 </content>
             </ScrollPane>
 
-            <Button fx:id="exportBtn" text="Export Report"
-                    style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20;"/>
         </VBox>
     </center>
 </BorderPane>

@@ -6,7 +6,7 @@ public class Student {
     private final IntegerProperty id;
     private final StringProperty rollNo;
     private final StringProperty name;
-    private final StringProperty className;  // ✅ new
+    private final StringProperty className;
     private final BooleanProperty present;
 
     public Student(int id, String rollNo, String name, boolean present, String className) {

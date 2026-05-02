@@ -51,7 +51,7 @@ public class login {
                     loader = new FXMLLoader(getClass().getResource("/com/example/myapp/student.fxml"));
                     root = loader.load();
 
-                    // ✅ get controller and pass studentId
+
                     StudentController controller = loader.getController();
                     controller.setStudentId(userId);
                     System.out.println("Logged-in student ID: " + userId);
@@ -61,8 +61,8 @@ public class login {
                     loader = new FXMLLoader(getClass().getResource("/com/example/myapp/reports.fxml"));
                     root = loader.load();
 
-                    // ✅ get controller and pass teacherId
-                    //
+
+
                     reportsController controller = loader.getController();
                     controller.setCurrentTeacherId(userId);
                     System.out.println("Logged-in teacher ID: " + userId);

@@ -3,54 +3,43 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-
 <?import javafx.scene.chart.PieChart?>
-<BorderPane xmlns="http://javafx.com/javafx/8"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.myapp.StudentController"
-            prefWidth="800" prefHeight="600">
+
+<BorderPane stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.myapp.StudentController" prefWidth="800" prefHeight="600">
 
     <top>
-        <HBox spacing="10" style="-fx-background-color: #2c3e50;">
-            <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
-            </padding>
-            <Label text="Student Panel"
-                   style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+        <HBox spacing="10" styleClass="top-bar">
+            <Label text="Student Panel" styleClass="label"/>
         </HBox>
     </top>
 
     <center>
-        <VBox spacing="15" style="-fx-background-color: #ecf0f1;">
+        <VBox spacing="20">
             <padding>
-                <Insets top="15" right="15" bottom="15" left="15"/>
+                <Insets top="25" right="25" bottom="25" left="25"/>
             </padding>
 
-            <GridPane hgap="10" vgap="10">
+            <GridPane hgap="15" vgap="15" styleClass="card">
                 <columnConstraints>
                     <ColumnConstraints halignment="RIGHT"/>
                     <ColumnConstraints hgrow="ALWAYS"/>
                 </columnConstraints>
 
-                <Label text="Roll Number:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <TextField fx:id="studentIdField" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Label text="Roll Number:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="sub-header-label"/>
+                <TextField fx:id="studentIdField" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="text-field"/>
 
-                <Label text="Name:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                <TextField fx:id="studentNameField" editable="false" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Label text="Name:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="sub-header-label"/>
+                <TextField fx:id="studentNameField" editable="false" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="text-field"/>
 
-                <Label text="Course:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                <TextField fx:id="studentCourseField" editable="false" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <Label text="Course:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="sub-header-label"/>
+                <TextField fx:id="studentCourseField" editable="false" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="text-field"/>
 
-                <Label text="Class:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                <ComboBox fx:id="classBox" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                <Label text="Class:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="sub-header-label"/>
+                <ComboBox fx:id="classBox" GridPane.rowIndex="3" GridPane.columnIndex="1" styleClass="combo-box"/>
             </GridPane>
 
-            <HBox spacing="20" alignment="CENTER_LEFT">
-
-
-                <TableView fx:id="attendanceTable"
-                           prefHeight="250"
-                           prefWidth="450">
+            <HBox spacing="25" alignment="CENTER_LEFT">
+                <TableView fx:id="attendanceTable" prefHeight="250" prefWidth="450" styleClass="table-view">
                     <placeholder>
                         <Label text="No attendance records"/>
                     </placeholder>
@@ -62,34 +51,30 @@
                 </TableView>
 
                 <!-- Attendance Chart -->
-                <VBox spacing="10" alignment="CENTER">
-                    <Label fx:id="attendancePercentLabel"
-                           text="Attendance: 0%"
-                           style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
-
-                    <PieChart fx:id="attendancePieChart"
-                              prefHeight="200"
-                              prefWidth="200"
-                              legendVisible="true"/>
+                <VBox spacing="15" alignment="CENTER" styleClass="card">
+                    <Label fx:id="attendancePercentLabel" text="Attendance: 0%" styleClass="header-label" style="-fx-font-size: 18px;"/>
+                    <PieChart fx:id="attendancePieChart" prefHeight="200" prefWidth="200" legendVisible="true"/>
                 </VBox>
-
             </HBox>
 
             <VBox spacing="10">
-                <Label text="Reason for Absence:"/>
-                <TextArea fx:id="absenceReasonArea" prefRowCount="3" wrapText="true"/>
-                <Button fx:id="submitReasonButton" text="Submit Reason"/>
+                <Label text="Request Leave:" styleClass="sub-header-label"/>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <DatePicker fx:id="leaveDatePicker" promptText="Select Date" styleClass="date-picker"/>
+                </HBox>
+                <TextArea fx:id="absenceReasonArea" promptText="Reason for leave..." prefRowCount="2" wrapText="true" styleClass="text-field"/>
+                <Button fx:id="submitReasonButton" text="Submit Request" styleClass="button, btn-primary"/>
             </VBox>
         </VBox>
     </center>
 
     <bottom>
-        <HBox spacing="10" alignment="CENTER">
+        <HBox spacing="15" alignment="CENTER">
             <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
+                <Insets top="15" right="15" bottom="15" left="15"/>
             </padding>
-            <Button fx:id="refreshButton" text="Refresh"/>
-            <Button fx:id="exportButton" text="Export Attendance"/>
+            <Button fx:id="refreshButton" text="Refresh" styleClass="button, btn-secondary"/>
+            <Button fx:id="exportButton" text="Export Attendance" styleClass="button, btn-secondary"/>
         </HBox>
     </bottom>
 </BorderPane>

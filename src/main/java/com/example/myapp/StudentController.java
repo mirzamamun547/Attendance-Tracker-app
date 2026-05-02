@@ -30,6 +30,7 @@ public class StudentController {
         @FXML private TableColumn<AttendanceRecord, String> statusColumn;
         @FXML private TableColumn<AttendanceRecord, String> remarksColumn;
 
+        @FXML private DatePicker leaveDatePicker;
         @FXML private TextArea absenceReasonArea;
         @FXML private Button submitReasonButton;
         @FXML private Button refreshButton;
@@ -68,7 +69,7 @@ public class StudentController {
         }
 
         private void loadStudentInfo() {
-            // ✅ only fetch roll_no and name from students
+
             String sql = "SELECT roll_no, name FROM students WHERE id=?";
             try (Connection con = DButil.getConnection();
                  PreparedStatement ps = con.prepareStatement(sql)) {
@@ -77,7 +78,6 @@ public class StudentController {
                 if (rs.next()) {
                     studentIdField.setText(rs.getString("roll_no"));
                     studentNameField.setText(rs.getString("name"));
-                    // course info will be filled from classes join
                     studentCourseField.setText("");
                     System.out.println("Loaded student: Roll=" + rs.getString("roll_no") + ", Name=" + rs.getString("name"));
                 }
@@ -90,7 +90,6 @@ public class StudentController {
             classNames.clear();
             classMap.clear();
 
-            // ✅ join through student_classes
             String sql = "SELECT c.id, c.class_name " +
                     "FROM classes c " +
                     "JOIN student_classes sc ON c.id = sc.class_id " +
@@ -113,7 +112,7 @@ public class StudentController {
             classBox.setItems(classNames);
             if (!classNames.isEmpty()) {
                 classBox.setValue(classNames.get(0));
-                studentCourseField.setText(classNames.get(0)); // ✅ show first class as course
+                studentCourseField.setText(classNames.get(0));
                 loadAttendanceForClass(classNames.get(0));
             }
 
@@ -163,8 +162,8 @@ public class StudentController {
                 }
             }
 
-            absenceReasonArea.setDisable(!hasUnexplainedAbsence);
-            submitReasonButton.setDisable(!hasUnexplainedAbsence);
+            // absenceReasonArea.setDisable(!hasUnexplainedAbsence);
+            // submitReasonButton.setDisable(!hasUnexplainedAbsence);
 
             // ✅ Calculate percentage
             double percent = totalDays > 0 ? (presentDays * 100.0 / totalDays) : 0;
@@ -178,7 +177,7 @@ public class StudentController {
                             : "-fx-text-fill: green; -fx-font-weight: bold;"
             );
 
-            // ✅ Update PieChart
+
             updatePieChart(presentDays, totalDays - presentDays);
 
         } catch (Exception e) {
@@ -194,60 +193,50 @@ public class StudentController {
 
         attendancePieChart.setData(pieData);
 
-        // 🎨 Custom colors
+
         pieData.get(0).getNode().setStyle("-fx-pie-color: #2ecc71;");
         pieData.get(1).getNode().setStyle("-fx-pie-color: #e74c3c;");
     }
 
     private void submitReason(ActionEvent event) {
-            String reason = absenceReasonArea.getText().trim();
-            if (reason.isEmpty()) {
-                new Alert(Alert.AlertType.WARNING, "Please enter a reason").show();
-                return;
-            }
+        String reason = absenceReasonArea.getText().trim();
+        LocalDate leaveDate = leaveDatePicker.getValue();
 
-            AttendanceRecord selectedRecord = attendanceTable.getSelectionModel().getSelectedItem();
-            if (selectedRecord == null) {
-                new Alert(Alert.AlertType.WARNING, "Please select an absence record from the table").show();
-                return;
-            }
-
-            if ("Present".equalsIgnoreCase(selectedRecord.getStatus())) {
-                new Alert(Alert.AlertType.WARNING, "You can only submit a reason for absences").show();
-                return;
-            }
-
-            String selectedClass = classBox.getValue();
-            Integer classId = classMap.get(selectedClass);
-            if (classId == null) {
-                new Alert(Alert.AlertType.WARNING, "Invalid class selection").show();
-                return;
-            }
-
-            String sql = "UPDATE attendance SET remarks=? " +
-                    "WHERE student_id=? AND class_id=? AND date=? AND present=0";
-
-            try (Connection con = DButil.getConnection();
-                 PreparedStatement ps = con.prepareStatement(sql)) {
-
-                ps.setString(1, reason);
-                ps.setInt(2, studentId);
-                ps.setInt(3, classId);
-                ps.setString(4, selectedRecord.getDate());
-
-                int updated = ps.executeUpdate();
-                if (updated > 0) {
-                    new Alert(Alert.AlertType.INFORMATION, "Reason submitted successfully").show();
-                    absenceReasonArea.clear();
-                    loadAttendanceForClass(selectedClass);
-                } else {
-                    new Alert(Alert.AlertType.WARNING, "No matching absence record found").show();
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (reason.isEmpty() || leaveDate == null) {
+            new Alert(Alert.AlertType.WARNING, "Please select a date and enter a reason").show();
+            return;
         }
+
+        String selectedClass = classBox.getValue();
+        Integer classId = classMap.get(selectedClass);
+        if (classId == null) {
+            new Alert(Alert.AlertType.WARNING, "Invalid class selection").show();
+            return;
+        }
+
+        String sql = "INSERT INTO leave_requests (student_id, class_id, date, reason, status) VALUES (?, ?, ?, ?, 'PENDING')";
+
+        try (Connection con = DButil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, studentId);
+            ps.setInt(2, classId);
+            ps.setString(3, leaveDate.toString());
+            ps.setString(4, reason);
+
+            int inserted = ps.executeUpdate();
+            if (inserted > 0) {
+                new Alert(Alert.AlertType.INFORMATION, "Leave Request submitted successfully!").show();
+                absenceReasonArea.clear();
+                leaveDatePicker.setValue(null);
+            } else {
+                new Alert(Alert.AlertType.WARNING, "Failed to submit leave request.").show();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
         private void exportAttendance() {
             FileChooser fileChooser = new FileChooser();

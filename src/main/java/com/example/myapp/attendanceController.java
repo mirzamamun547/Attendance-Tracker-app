@@ -81,7 +81,7 @@ public class attendanceController {
         Integer classId = classMap.get(className);
         if (classId == null) return;
 
-        // ✅ FIX: filter by class’s teacher_id, not student’s
+
         String sql = "SELECT s.id, s.roll_no, s.name " +
                 "FROM students s " +
                 "JOIN student_classes sc ON s.id = sc.student_id " +
@@ -138,6 +138,24 @@ public class attendanceController {
             }
 
             ps.executeBatch();
+            
+            // Send Email Notifications for Absences
+            for (Student s : students) {
+                if (!s.isPresent()) {
+                    String getEmailSql = "SELECT email FROM students WHERE id = ?";
+                    try (PreparedStatement emailPs = con.prepareStatement(getEmailSql)) {
+                        emailPs.setInt(1, s.getId());
+                        ResultSet rs = emailPs.executeQuery();
+                        if (rs.next()) {
+                            String email = rs.getString("email");
+                            if (email != null && !email.isBlank()) {
+                                EmailService.sendAbsenceAlert(email, s.getName(), date.toString(), className);
+                            }
+                        }
+                    }
+                }
+            }
+
             new Alert(Alert.AlertType.INFORMATION, "Attendance saved successfully").show();
 
         } catch (Exception e) {

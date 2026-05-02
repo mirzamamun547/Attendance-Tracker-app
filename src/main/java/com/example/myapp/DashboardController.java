@@ -12,6 +12,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.GridPane;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
 import java.sql.*;
@@ -28,12 +30,25 @@ public class DashboardController {
     @FXML private Button deleteStudentBtn;
     @FXML private Button addClassBtn; // Create class
     @FXML private DatePicker datePicker;
-@FXML
+    
+    // Leave Requests
+    @FXML private TableView<LeaveRequest> leaveTable;
+    @FXML private TableColumn<LeaveRequest, String> leaveStudentCol;
+    @FXML private TableColumn<LeaveRequest, String> leaveClassCol;
+    @FXML private TableColumn<LeaveRequest, String> leaveDateCol;
+    @FXML private TableColumn<LeaveRequest, String> leaveReasonCol;
+
+    // Analytics
+    @FXML private LineChart<String, Number> attendanceChart;
+    @FXML private ListView<String> atRiskList;
+
+    @FXML
     private int currentTeacherId;
 
     private final ObservableList<Student> studentList = FXCollections.observableArrayList();
     private final ObservableList<String> classes = FXCollections.observableArrayList();
     private final Map<String, Integer> classMap = new HashMap<>();
+    private final ObservableList<LeaveRequest> leaveList = FXCollections.observableArrayList();
 
     private void loadStudents() {
         studentList.clear();
@@ -66,7 +81,7 @@ public class DashboardController {
     }
 
 
-    // Fixed CheckBox column
+
     @FXML
     public void initialize() {
         rollCol.setCellValueFactory(c -> c.getValue().rollNoProperty());
@@ -75,6 +90,14 @@ public class DashboardController {
         presentCol.setCellFactory(tc -> new CheckBoxTableCell<>());
 
         studentTable.setItems(studentList);
+
+        if (leaveStudentCol != null) {
+            leaveStudentCol.setCellValueFactory(c -> c.getValue().studentNameProperty());
+            leaveClassCol.setCellValueFactory(c -> c.getValue().classNameProperty());
+            leaveDateCol.setCellValueFactory(c -> c.getValue().dateProperty());
+            leaveReasonCol.setCellValueFactory(c -> c.getValue().reasonProperty());
+            leaveTable.setItems(leaveList);
+        }
 
         addStudentBtn.setOnAction(e -> addStudent());
         deleteStudentBtn.setOnAction(e -> deleteSelectedStudent());
@@ -385,6 +408,103 @@ public class DashboardController {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Error loading attendance").show();
         }
+    }
+
+    @FXML
+    private void loadLeaveRequests() {
+        leaveList.clear();
+        String sql = "SELECT lr.id, lr.student_id, s.name, c.class_name, lr.date, lr.reason " +
+                     "FROM leave_requests lr " +
+                     "JOIN students s ON lr.student_id = s.id " +
+                     "JOIN classes c ON lr.class_id = c.id " +
+                     "WHERE c.teacher_id = ? AND lr.status = 'PENDING'";
+
+        try (Connection con = DButil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, currentTeacherId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                leaveList.add(new LeaveRequest(
+                    rs.getInt("id"), rs.getInt("student_id"), rs.getString("name"),
+                    rs.getString("class_name"), rs.getString("date"), rs.getString("reason")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void approveLeave() {
+        LeaveRequest request = leaveTable.getSelectionModel().getSelectedItem();
+        if (request == null) { new Alert(Alert.AlertType.WARNING, "Select a request").show(); return; }
+        
+        try (Connection con = DButil.getConnection()) {
+            // Update leave request status
+            PreparedStatement ps1 = con.prepareStatement("UPDATE leave_requests SET status = 'APPROVED' WHERE id = ?");
+            ps1.setInt(1, request.getId());
+            ps1.executeUpdate();
+            
+            // Insert attendance record as Excused (present=1 with remark)
+            PreparedStatement ps2 = con.prepareStatement("INSERT OR REPLACE INTO attendance (student_id, class_id, date, present, remarks) " +
+                    "VALUES (?, (SELECT id FROM classes WHERE class_name=? AND teacher_id=?), ?, 1, 'Excused Leave')");
+            ps2.setInt(1, request.getStudentId());
+            ps2.setString(2, request.getClassName());
+            ps2.setInt(3, currentTeacherId);
+            ps2.setString(4, request.getDate());
+            ps2.executeUpdate();
+            
+            loadLeaveRequests();
+            new Alert(Alert.AlertType.INFORMATION, "Leave Approved").show();
+        } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    @FXML
+    private void denyLeave() {
+        LeaveRequest request = leaveTable.getSelectionModel().getSelectedItem();
+        if (request == null) { new Alert(Alert.AlertType.WARNING, "Select a request").show(); return; }
+        
+        try (Connection con = DButil.getConnection()) {
+            PreparedStatement ps = con.prepareStatement("UPDATE leave_requests SET status = 'DENIED' WHERE id = ?");
+            ps.setInt(1, request.getId());
+            ps.executeUpdate();
+            loadLeaveRequests();
+        } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    @FXML
+    private void loadAnalytics() {
+        attendanceChart.getData().clear();
+        atRiskList.getItems().clear();
+        
+        // Load Chart Data
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Average Class Attendance");
+        
+        String chartSql = "SELECT date, AVG(present)*100 as avg_att FROM attendance a JOIN classes c ON a.class_id=c.id WHERE c.teacher_id=? GROUP BY date ORDER BY date DESC LIMIT 7";
+        try (Connection con = DButil.getConnection(); PreparedStatement ps = con.prepareStatement(chartSql)) {
+            ps.setInt(1, currentTeacherId);
+            ResultSet rs = ps.executeQuery();
+            List<XYChart.Data<String, Number>> dataPoints = new ArrayList<>();
+            while(rs.next()) {
+                dataPoints.add(new XYChart.Data<>(rs.getString("date"), rs.getDouble("avg_att")));
+            }
+            Collections.reverse(dataPoints);
+            series.getData().addAll(dataPoints);
+            attendanceChart.getData().add(series);
+        } catch (SQLException e) { e.printStackTrace(); }
+
+        // Load At-Risk Students
+        String riskSql = "SELECT s.name, AVG(a.present)*100 as att_percent " +
+                         "FROM students s JOIN attendance a ON s.id=a.student_id " +
+                         "WHERE s.teacher_id=? GROUP BY s.id HAVING att_percent < 75.0";
+        try (Connection con = DButil.getConnection(); PreparedStatement ps = con.prepareStatement(riskSql)) {
+            ps.setInt(1, currentTeacherId);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+                atRiskList.getItems().add(rs.getString("name") + " - " + String.format("%.1f%%", rs.getDouble("att_percent")));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
     }
 
     private record StudentData(String clazz, String roll, String name) {}
