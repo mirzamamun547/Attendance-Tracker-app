@@ -74,7 +74,7 @@
                         <xAxis><CategoryAxis label="Date"/></xAxis>
                         <yAxis><NumberAxis label="Attendance %" lowerBound="0" upperBound="100"/></yAxis>
                     </LineChart>
-                    <Label styleClass="header-label" text="At-Risk Students (< 75%)" />
+                    <Label styleClass="header-label" text="At-Risk Students (&lt; 75%)" />
                     <ListView fx:id="atRiskList" prefHeight="150" styleClass="table-view" />
                 </VBox>
             </Tab>

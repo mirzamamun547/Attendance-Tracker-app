@@ -14,58 +14,60 @@
     </top>
 
     <center>
-        <VBox spacing="20">
-            <padding>
-                <Insets top="25" right="25" bottom="25" left="25"/>
-            </padding>
+        <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+            <VBox spacing="20">
+                <padding>
+                    <Insets top="25" right="25" bottom="25" left="25"/>
+                </padding>
 
-            <GridPane hgap="15" vgap="15" styleClass="card">
-                <columnConstraints>
-                    <ColumnConstraints halignment="RIGHT"/>
-                    <ColumnConstraints hgrow="ALWAYS"/>
-                </columnConstraints>
+                <GridPane hgap="15" vgap="15" styleClass="card">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                    </columnConstraints>
 
-                <Label text="Roll Number:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="sub-header-label"/>
-                <TextField fx:id="studentIdField" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="text-field"/>
+                    <Label text="Roll Number:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="sub-header-label"/>
+                    <TextField fx:id="studentIdField" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="text-field"/>
 
-                <Label text="Name:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="sub-header-label"/>
-                <TextField fx:id="studentNameField" editable="false" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="text-field"/>
+                    <Label text="Name:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="sub-header-label"/>
+                    <TextField fx:id="studentNameField" editable="false" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="text-field"/>
 
-                <Label text="Course:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="sub-header-label"/>
-                <TextField fx:id="studentCourseField" editable="false" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="text-field"/>
+                    <Label text="Course:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="sub-header-label"/>
+                    <TextField fx:id="studentCourseField" editable="false" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="text-field"/>
 
-                <Label text="Class:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="sub-header-label"/>
-                <ComboBox fx:id="classBox" GridPane.rowIndex="3" GridPane.columnIndex="1" styleClass="combo-box"/>
-            </GridPane>
+                    <Label text="Class:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="sub-header-label"/>
+                    <ComboBox fx:id="classBox" GridPane.rowIndex="3" GridPane.columnIndex="1" styleClass="combo-box"/>
+                </GridPane>
 
-            <HBox spacing="25" alignment="CENTER_LEFT">
-                <TableView fx:id="attendanceTable" prefHeight="250" prefWidth="450" styleClass="table-view">
-                    <placeholder>
-                        <Label text="No attendance records"/>
-                    </placeholder>
-                    <columns>
-                        <TableColumn fx:id="dateColumn" text="Date" prefWidth="150"/>
-                        <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
-                        <TableColumn fx:id="remarksColumn" text="Remarks" prefWidth="200"/>
-                    </columns>
-                </TableView>
+                <HBox spacing="25" alignment="CENTER_LEFT">
+                    <TableView fx:id="attendanceTable" prefHeight="250" prefWidth="450" styleClass="table-view">
+                        <placeholder>
+                            <Label text="No attendance records"/>
+                        </placeholder>
+                        <columns>
+                            <TableColumn fx:id="dateColumn" text="Date" prefWidth="150"/>
+                            <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
+                            <TableColumn fx:id="remarksColumn" text="Remarks" prefWidth="200"/>
+                        </columns>
+                    </TableView>
 
-                <!-- Attendance Chart -->
-                <VBox spacing="15" alignment="CENTER" styleClass="card">
-                    <Label fx:id="attendancePercentLabel" text="Attendance: 0%" styleClass="header-label" style="-fx-font-size: 18px;"/>
-                    <PieChart fx:id="attendancePieChart" prefHeight="200" prefWidth="200" legendVisible="true"/>
-                </VBox>
-            </HBox>
-
-            <VBox spacing="10">
-                <Label text="Request Leave:" styleClass="sub-header-label"/>
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <DatePicker fx:id="leaveDatePicker" promptText="Select Date" styleClass="date-picker"/>
+                    <!-- Attendance Chart -->
+                    <VBox spacing="15" alignment="CENTER" styleClass="card">
+                        <Label fx:id="attendancePercentLabel" text="Attendance: 0%" styleClass="header-label" style="-fx-font-size: 18px;"/>
+                        <PieChart fx:id="attendancePieChart" prefHeight="200" prefWidth="200" legendVisible="true"/>
+                    </VBox>
                 </HBox>
-                <TextArea fx:id="absenceReasonArea" promptText="Reason for leave..." prefRowCount="2" wrapText="true" styleClass="text-field"/>
-                <Button fx:id="submitReasonButton" text="Submit Request" styleClass="button, btn-primary"/>
+
+                <VBox spacing="10">
+                    <Label text="Request Leave:" styleClass="sub-header-label"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <DatePicker fx:id="leaveDatePicker" promptText="Select Date" styleClass="date-picker"/>
+                    </HBox>
+                    <TextArea fx:id="absenceReasonArea" promptText="Reason for leave..." prefRowCount="2" wrapText="true" styleClass="text-field"/>
+                    <Button fx:id="submitReasonButton" text="Submit Request" styleClass="button, btn-primary"/>
+                </VBox>
             </VBox>
-        </VBox>
+        </ScrollPane>
     </center>
 
     <bottom>

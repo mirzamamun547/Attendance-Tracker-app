@@ -13,6 +13,7 @@ module com.example.myapp {
     requires javafx.graphics;
     requires java.sql;
     requires javafx.base;
+    requires java.mail;
 
     opens com.example.myapp to javafx.fxml;
     exports com.example.myapp;

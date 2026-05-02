@@ -194,36 +194,40 @@ public class DashboardController {
         ComboBox<String> classBox = new ComboBox<>(classes);
         TextField rollField = new TextField();
         TextField nameField = new TextField();
+        TextField emailField = new TextField();
         classBox.setPromptText("Class");
         rollField.setPromptText("Roll No");
         nameField.setPromptText("Name");
+        emailField.setPromptText("Email Address");
 
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10);
         grid.addRow(0, new Label("Class:"), classBox);
         grid.addRow(1, new Label("Roll:"), rollField);
         grid.addRow(2, new Label("Name:"), nameField);
+        grid.addRow(3, new Label("Email:"), emailField);
         dialog.getDialogPane().setContent(grid);
 
         Node okButton = dialog.getDialogPane().lookupButton(ButtonType.OK);
         okButton.setDisable(true);
 
         ChangeListener<String> validator = (obs, oldVal, newVal) ->
-                okButton.setDisable(classBox.getValue()==null || rollField.getText().isBlank() || nameField.getText().isBlank());
+                okButton.setDisable(classBox.getValue()==null || rollField.getText().isBlank() || nameField.getText().isBlank() || emailField.getText().isBlank());
         classBox.valueProperty().addListener((obs,o,n) -> validator.changed(null,null,null));
         rollField.textProperty().addListener(validator);
         nameField.textProperty().addListener(validator);
+        emailField.textProperty().addListener(validator);
 
         dialog.setResultConverter(btn ->
                 btn.getButtonData()==ButtonBar.ButtonData.OK_DONE ?
-                        new StudentData(classBox.getValue(), rollField.getText(), nameField.getText()) : null);
+                        new StudentData(classBox.getValue(), rollField.getText(), nameField.getText(), emailField.getText()) : null);
 
         dialog.showAndWait().ifPresent(data -> {
             String password = generatePassword();
-            String email = data.roll() + "@school.local";
+            String email = data.email();
             int classId = classMap.get(data.clazz());
             insertStudent(currentTeacherId, classId, data.roll(), data.name(), email, password);
-            new Alert(Alert.AlertType.INFORMATION, "Email: " + email + "\nPassword: " + password).show();
+            new Alert(Alert.AlertType.INFORMATION, "Student Added!\nEmail: " + email + "\nPassword: " + password).show();
         });
     }
     private void insertStudent(int teacherId, int classId, String roll, String name, String email, String password) {
@@ -507,5 +511,5 @@ public class DashboardController {
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
-    private record StudentData(String clazz, String roll, String name) {}
+    private record StudentData(String clazz, String roll, String name, String email) {}
 }
